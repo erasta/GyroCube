@@ -6,19 +6,20 @@ using UnityEngine;
 public class GyroDetails : MonoBehaviour {
 	// Faces for 6 sides of the cube
 	private GameObject [] quads = new GameObject [6];
+	bool calcAttitudeFromGravity = false;
 
 	void Start ()
 	{
 		Input.backButtonLeavesApp = true;
 		Input.gyro.enabled = true;
-		
+
 		// make camera solid colour and based at the origin
 		//GetComponent<Camera> ().backgroundColor = new Color (49.0f / 255.0f, 77.0f / 255.0f, 121.0f / 255.0f);
 		GetComponent<Camera> ().transform.position = new Vector3 (0, 0, 0);
 		GetComponent<Camera> ().clearFlags = CameraClearFlags.SolidColor;
 
 		// create the six quads forming the sides of a cube
-		quads [0] = CreateQuad (new Vector3 (1, 0, 0), new Vector3 (0, 90, 0), "plus x", new Color (0.90f, 0.10f, 0.10f, 1) );
+		quads [0] = CreateQuad (new Vector3 (1, 0, 0), new Vector3 (0, 90, 0), "plus x", new Color (0.90f, 0.10f, 0.10f, 1));
 		quads [1] = CreateQuad (new Vector3 (0, 1, 0), new Vector3 (-90, 0, 0), "plus y", new Color (0.10f, 0.90f, 0.10f, 1));
 		quads [2] = CreateQuad (new Vector3 (0, 0, 1), new Vector3 (0, 0, 0), "plus z", new Color (0.10f, 0.10f, 0.90f, 1));
 		quads [3] = CreateQuad (new Vector3 (-1, 0, 0), new Vector3 (0, -90, 0), "neg x", new Color (0.90f, 0.50f, 0.50f, 1));
@@ -43,6 +44,7 @@ public class GyroDetails : MonoBehaviour {
 	protected void OnGUI ()
 	{
 		GUI.skin.label.fontSize = Screen.width / 40;
+		GUI.skin.toggle.fontSize = Screen.width / 40;
 		GUILayout.Label ("  Orientation: " + Screen.orientation);
 		GUILayout.Label ("  width/font: " + Screen.width + " : " + GUI.skin.label.fontSize);
 		GUILayout.Label ("  attitude: " + Input.gyro.attitude);
@@ -51,6 +53,7 @@ public class GyroDetails : MonoBehaviour {
 		GUILayout.Label ("  rotationRate: " + Input.gyro.rotationRate);
 		GUILayout.Label ("  rotationRateUnbiased: " + Input.gyro.rotationRateUnbiased);
 		GUILayout.Label ("  updateInterval: " + Input.gyro.updateInterval);
+		calcAttitudeFromGravity = GUILayout.Toggle (calcAttitudeFromGravity, "calcAttitudeFromGravity?", "button");
 	}
 
 	protected void Update ()
@@ -64,11 +67,12 @@ public class GyroDetails : MonoBehaviour {
 	// Make the necessary change to the camera.
 	void GyroModifyCamera ()
 	{
-		transform.rotation = GyroToUnity (Input.gyro.attitude);
+		var q = Input.gyro.attitude;
+		if (calcAttitudeFromGravity) {
+			var g = Input.gyro.gravity;
+			q = Quaternion.FromToRotation (g, new Vector3 (0, 0, -1f));
+		}
+		transform.rotation = new Quaternion (q.x, q.y, -q.z, -q.w);
 	}
 
-	private static Quaternion GyroToUnity (Quaternion q)
-	{
-		return new Quaternion (q.x, q.y, -q.z, -q.w);
-	}
 }
