@@ -3,7 +3,7 @@
 
 using UnityEngine;
 
-public class ExampleScript : MonoBehaviour {
+public class GyroDetails : MonoBehaviour {
 	// Faces for 6 sides of the cube
 	private GameObject [] quads = new GameObject [6];
 
@@ -13,6 +13,7 @@ public class ExampleScript : MonoBehaviour {
 
 	void Start ()
 	{
+		Input.backButtonLeavesApp = true;
 		Input.gyro.enabled = true;
 		
 		// make camera solid colour and based at the origin
@@ -54,10 +55,14 @@ public class ExampleScript : MonoBehaviour {
 	protected void OnGUI ()
 	{
 		GUI.skin.label.fontSize = Screen.width / 40;
-
-		GUILayout.Label ("Orientation: " + Screen.orientation);
-		GUILayout.Label ("input.gyro.attitude: " + Input.gyro.attitude);
-		GUILayout.Label ("iphone width/font: " + Screen.width + " : " + GUI.skin.label.fontSize);
+		GUILayout.Label ("  Orientation: " + Screen.orientation);
+		GUILayout.Label ("  width/font: " + Screen.width + " : " + GUI.skin.label.fontSize);
+		GUILayout.Label ("  attitude: " + Input.gyro.attitude);
+		GUILayout.Label ("  gravity: " + Input.gyro.gravity);
+		GUILayout.Label ("  userAcceleration: " + Input.gyro.userAcceleration);
+		GUILayout.Label ("  rotationRate: " + Input.gyro.rotationRate);
+		GUILayout.Label ("  rotationRateUnbiased: " + Input.gyro.rotationRateUnbiased);
+		GUILayout.Label ("  updateInterval: " + Input.gyro.updateInterval);
 	}
 
 	/********************************************/
